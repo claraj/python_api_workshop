@@ -1,15 +1,24 @@
 import requests
 import os
 
-apiKey = os.environ['APIKEY']   # TODO set this environment variable in PyCharm or for your OS
+# apiKey = os.environ['APIKEY']   # TODO set this environment variable in PyCharm or for your OS
+
+## Using these for all the requests 
+
+apiKey = ''   # TODO Env variable for key
+
 print(apiKey)
 
-# Example fetching data from ATM location API
-
-url = 'https://alpha-api.usbank.com/innovation-locations/v1/StringQuery?application=parasoft&transactionid=afae903d-8946-4f88-a958-4bdbcf0bed6f&output=json&searchtype=A&stringquery=55403&branchfeatures=BOP'
-
 header = {'apiKey': apiKey}
-response = requests.get(url, headers=header).json()
+
+
+
+print('\nLOCATION API CALL\n')
+
+# Example fetching data from ATM location API
+atm_location_url = 'https://alpha-api.usbank.com/innovation-locations/v1/StringQuery?application=parasoft&transactionid=afae903d-8946-4f88-a958-4bdbcf0bed6f&output=json&searchtype=A&stringquery=55403&branchfeatures=BOP'
+
+response = requests.get(atm_location_url, headers=header).json()
 
 reply = response['GetListATMorBranchReply']
 atmList = reply['ATMList']  # Todo extract specific location data needed
@@ -17,53 +26,50 @@ atmList = reply['ATMList']  # Todo extract specific location data needed
 for atm in atmList:
     print(atm)
 
+
+
+print('\nLOAN RATE API CALL\n')
+
 # Example fetching data from Loan Rates API
 
 autoloan = 'https://alpha-api.usbank.com/innovation-rate/v1/GetAutoLoanRates?application=RIB&output=json&branchnumber=1&zipcode=80130&regionid=1&loanamount=24000&loantermmonths=12&loanproduct=NEW'
-header = {'apiKey': apiKey}
 
 rateResponse = requests.get(autoloan, headers=header).json()
+print(rateResponse)
 rate = rateResponse['AutoLoanRates']['RateTier']['Rate']
 print('The rate is ', rate)
 
 
-## How to get data from accounts and users?????
+print('\nACCOUNTS AND USERS API CALL\n')
 
-users_url = 'https://alpha-api.usbank.com/innovation/v1/user/accounts'
-users_url = 'https://jcm-bank-43157.appspot.com/v1/user/accounts'
-ids = requests.get(users_url, headers=header).json()
-print(ids)
+doc_users_url = 'https://alpha-api.usbank.com/innovation/v1/user/'  # What the documentation seems to say
+users_url = 'http://jcm-bank-43157.appspot.com/users'    # The server that the request is being proxied to - but the proxing seems to be failing 
 
-## TODOs for Users:
+response  = requests.get(users_url, headers=header).json()
+print(response)
+
+users = response['UserList']
+
+for user in users:
+    print(user)   # Example {'LegalParticipantIdentifier': '000995928731567433'} these are IDs used to make more calls for user account info
+
 """
 Make sure server is up, figure out URL
 Make GET request to get all users id    or all account int   -- these should have list of IDs for users or accounts
 
-Make  POST request about specific user 
+Make POST request about specific user 
 Make POST request about specific account   
 
 
 response = requests.post(url, data= {"whatever":"whatever"} ).json()
 
-Use a Python OAuth library if you need to authenticate with OAuth 
-
-# Requests docs at https://requests.kennethreitz.org/en/master/user/quickstart/#make-a-request
-
 """
 
-# Hypothetical OAuth request to server
-# from requests_oauthlib import OAuth1Session
-# usbank = OAuth1Session(apiKey,
-#                             client_secret='todoreplace_with_real_secret',
-#                        )
-# r = usbank.get(accounts_url)
-# print(r.text)
-url = 'https://alpha-api.usbank.com/innovation/v1/user/accounts'
-url = 'https://jcm-bank-43157.appspot.com/innovation/v1/user/accounts'
 
-data = {'LegalParticipantIdentifier': 'whatever'}  # find this out from query to /users endpoint
-account_info = requests.post(url, headers=header, data=data).json()
-print(account_info)
+# params = {'transactionid': 'afae903d-8946-4f88-a958-4bdbcf0bed6f&', 'application':'parasoft'}
+# # data = {'LegalParticipantIdentifier': 'whatever', }  # find this out from query to /users endpoint
+# account_info = requests.post(url, headers=header, params=params, data=data).json()
+# print(account_info)
 
 
 
