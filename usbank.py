@@ -1,12 +1,9 @@
 import requests
 import os
 
-# apiKey = os.environ['APIKEY']   # TODO set this environment variable in PyCharm or for your OS
+apiKey = os.environ['APIKEY']   # TODO set this environment variable in PyCharm or for your OS
 
-## Using these for all the requests 
-
-apiKey = ''   # TODO Env variable for key
-
+# Used for all the requests 
 print(apiKey)
 
 header = {'apiKey': apiKey}
@@ -53,6 +50,8 @@ users = response['UserList']
 for user in users:
     print(user)   # Example {'LegalParticipantIdentifier': '000995928731567433'} these are IDs used to make more calls for user account info
 
+
+example_user = users[0]
 """
 Make sure server is up, figure out URL
 Make GET request to get all users id    or all account int   -- these should have list of IDs for users or accounts
@@ -66,10 +65,14 @@ response = requests.post(url, data= {"whatever":"whatever"} ).json()
 """
 
 
-# params = {'transactionid': 'afae903d-8946-4f88-a958-4bdbcf0bed6f&', 'application':'parasoft'}
-# # data = {'LegalParticipantIdentifier': 'whatever', }  # find this out from query to /users endpoint
-# account_info = requests.post(url, headers=header, params=params, data=data).json()
-# print(account_info)
+get_account_info_url = 'http://jcm-bank-43157.appspot.com/user/accounts/'    # The server the message is proxied to, according to Postman, although it's 404'ing
+get_account_info_url = 'https://alpha-api.usbank.com/innovation/v1/user/accounts'    # What the docs say, although it's not proxying 
+
+user_id = example_user['LegalParticipantIdentifier']
+print(user_id)
+data = {'LegalParticipantIdentifier': example_user['LegalParticipantIdentifier'] }  # find this out from query to /users endpoint
+account_info = requests.post(get_account_info_url, headers=header, data=data).json()
+print(account_info)
 
 
 
